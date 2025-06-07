@@ -97,14 +97,6 @@ Performance Breakdown:
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📧 Contact
-
-[Your contact information]
-
 ## 🙏 Acknowledgments
 
 - Thanks to the Kaggle community for providing the Brain Tumor MRI Dataset
