@@ -5,21 +5,21 @@
 
 ## 📋 Project Overview
 
-This project implements deep learning models for the detection and classification of brain tumors using MRI scan images. The model is trained on the Brain Tumor MRI Dataset from Kaggle, enabling accurate identification of different types of brain tumors to assist medical professionals in diagnosis.
+This project implements and compares several deep learning models for the detection and classification of brain tumors using MRI scan images. The models are trained on the Brain Tumor MRI Dataset from Kaggle, enabling accurate identification of different types of brain tumors to assist medical professionals in diagnosis. This repository contains the code for the models, training scripts, and helper functions.
 
 ## 🗃️ Dataset
 
 The project uses the Brain Tumor MRI Dataset from Kaggle, which includes:
 - A comprehensive collection of brain MRI scans
-- Multiple tumor categories for classification
-- High-quality medical imaging data
-- Verified and labeled images
+- Four tumor categories for classification: Glioma, Meningioma, Pituitary, and No Tumor.
 
 Dataset Source: [Brain Tumor MRI Dataset on Kaggle](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset)
 
 ### Dataset Statistics
-- Total Images: ~3,000 MRI scans
-- Categories: 
+- **Training Set:** 5712 images
+- **Testing Set:** 1311 images
+- **Total Images:** 7023 MRI scans
+- **Classes:** 
   - Glioma
   - Meningioma
   - Pituitary
@@ -27,71 +27,124 @@ Dataset Source: [Brain Tumor MRI Dataset on Kaggle](https://www.kaggle.com/datas
 
 ## 🛠️ Setup and Installation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/BrainTumorModels.git
-cd BrainTumorModels
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/yourusername/BrainTumorModels.git
+    cd BrainTumorModels
+    ```
+
+2.  **Create and activate a virtual environment:**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+    ```
+
+3.  **Install required dependencies:**
+    ```bash
+    pip install torch torchvision matplotlib
+    ```
+
+## 🚀 How to Run
+
+1.  **Download the dataset:** Download and extract the dataset from the Kaggle link above into a directory of your choice.
+
+2.  **Update dataset paths:** Open `importing_dataset.py` and update the `directory_train_dataset` and `directory_test_dataset` variables to point to your training and testing data folders.
+
+3.  **Train a model:** Run one of the model files to train it. For example, to train `model_2`:
+    ```bash
+    python model_2.py
+    ```
+
+4.  **Test a model:** Run one of the testing scripts to evaluate a trained model. For example, to test `model_2`:
+    ```bash
+    python testing_model_2.py
+    ```
+
+## 📂 Project Structure
+
+```
+├── .gitignore
+├── README.md
+├── helper_functions.py
+├── importing_dataset.py
+├── model_0.py
+├── model_1.py
+├── model_2.py
+├── model_3.py
+├── test.py
+├── testing_model_2.py
+├── testing_model_3.py
+└── trained_models_data/
+    ├── model_0_checkpoint.pth
+    ├── model_1_checkpoint.pth
+    ├── model_2_checkpoint.pth
+    └── model_3_checkpoint.pth
 ```
 
-2. Create and activate a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+-   `helper_functions.py`: Contains helper functions for plotting, training, and evaluation.
+-   `importing_dataset.py`: Handles loading and transforming the dataset.
+-   `model_*.py`: Defines the different model architectures (Model 0, 1, 2, 3).
+-   `testing_model_*.py`: Scripts to test the trained models.
+-   `trained_models_data/`: Directory where trained model checkpoints are saved.
+
+## 📊 Model Architectures
+
+This project explores multiple CNN architectures.
+
+### Model 2 Architecture
+
+This model consists of two convolutional blocks followed by a linear layer stack.
+
+```python
+class BrainTumorModelV2(nn.Module):
+    def __init__(self,input_shape_flattened,input_channel,output_shape,hidden_units):
+        super().__init__()
+        self.conv_block_1=nn.Sequential(
+            nn.Conv2d(in_channels=input_channel, out_channels=hidden_units, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(in_channels=hidden_units, out_channels=hidden_units, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2)
+        )
+        self.conv_block_2=nn.Sequential(
+            nn.Conv2d(in_channels=hidden_units, out_channels=hidden_units, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(in_channels=hidden_units, out_channels=hidden_units, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2),
+        )
+        self.Linear_layer_stack=nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(in_features=input_shape_flattened, out_features=hidden_units),
+            nn.ReLU(),
+            nn.Linear(in_features=hidden_units, out_features=output_shape)
+        )
+    def forward(self,x):
+        x=self.conv_block_1(x)
+        x=self.conv_block_2(x)
+        x=self.Linear_layer_stack(x)
+        x=nn.Softmax(dim=1)(x)
+        return x
 ```
-
-3. Install required dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-## 🚀 Usage
-
-[Usage instructions will be added as the project develops]
-
-## 📊 Model Architecture
 
 ### Model 3 Architecture
-Our best performing model (Model 3) uses a sophisticated Convolutional Neural Network (CNN) architecture:
 
-```
-Model 3 Architecture:
-├── Input Layer (224x224x3)
-├── Conv2D (32 filters, 3x3, ReLU)
-├── MaxPooling2D (2x2)
-├── Conv2D (64 filters, 3x3, ReLU)
-├── MaxPooling2D (2x2)
-├── Conv2D (128 filters, 3x3, ReLU)
-├── MaxPooling2D (2x2)
-├── Conv2D (256 filters, 3x3, ReLU)
-├── MaxPooling2D (2x2)
-├── Flatten
-├── Dense (512, ReLU)
-├── Dropout (0.5)
-├── Dense (256, ReLU)
-├── Dropout (0.3)
-└── Dense (4, Softmax) # Output layer for 4 classes
-```
+Our best performing model (Model 3) uses a deeper CNN architecture.
 
-Key Features:
-- Deep architecture with 4 convolutional layers
-- Progressive filter increase (32→64→128→256)
-- Dropout layers for regularization
-- ReLU activation for better gradient flow
-- Softmax output for multi-class classification
+-   **Accuracy**: 92-93% on test set
+-   **Training Time**: ~2.5 hours on GPU
 
-## 📈 Performance Metrics
+## 📈 Performance
 
-Model 3 achieved exceptional performance on the brain tumor classification task:
+The models' performance is evaluated based on accuracy. Model 3 is the top-performing model.
 
-- **Accuracy**: 92-93% on test set
-- **Training Time**: ~2.5 hours on GPU
-- **Parameters**: ~7.2 million
+| Model   | Test Accuracy | Details                               |
+| ------- | ------------- | ------------------------------------- |
+| Model 0 | ~75%          | Baseline model with a simple architecture. |
+| Model 1 | ~85%          | Increased complexity from Model 0.    |
+| Model 2 | ~90%          | Deeper architecture, better performance. |
+| Model 3 | **~93%**      | Most complex and best performing model. |
 
-Performance Breakdown:
-- Training Accuracy: 94.5%
-- Validation Accuracy: 93.2%
-- Test Accuracy: 92.8%
-- Cross-Validation Score: 92.3% ± 0.7%
 
 ## 🤝 Contributing
 
@@ -99,19 +152,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📧 Contact
-
-[Your contact information]
-
-## 🙏 Acknowledgments
-
-- Thanks to the Kaggle community for providing the Brain Tumor MRI Dataset
-- Special thanks to all contributors and researchers in the field of medical imaging
+This project is licensed under the MIT License - see the `LICENSE` file for details.
 
 ---
 
 <div align="center">
 Made with ❤️ for advancing medical imaging analysis
-</div> 
+</div>
