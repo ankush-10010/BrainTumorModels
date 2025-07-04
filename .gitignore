@@ -1,0 +1,9 @@
+# Ignore virtual environments and installed libraries
+Lib/
+venv/
+*.dll
+*.lib
+*.pyd
+__pycache__/
+*.pyc
+*.ipynb_checkpoints/
